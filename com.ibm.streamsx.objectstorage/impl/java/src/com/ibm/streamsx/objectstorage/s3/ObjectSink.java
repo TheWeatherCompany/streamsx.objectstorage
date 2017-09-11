@@ -110,9 +110,14 @@ public class ObjectSink extends AbstractOperator {
 //        clientConf.withUseExpectContinue(false);
 //        clientConf.withSignerOverride("S3SignerType");
         clientConf.setProtocol(Protocol.HTTP);
-        
-        AWSCredentials creds = new BasicAWSCredentials(getAccessKeyID(), getSecretAccessKey());
-        client = new AmazonS3Client(creds, clientConf);        
+
+        if (getAccessKeyID() != null) {
+            AWSCredentials creds = new BasicAWSCredentials(getAccessKeyID(), getSecretAccessKey());
+            client = new AmazonS3Client(creds, clientConf);
+        } else {
+            client = new AmazonS3Client(clientConf);
+            _trace.trace("Created Client with no creds");
+        }
         client.setEndpoint(endpoint);
 //        client.setS3ClientOptions(new S3ClientOptions().withPathStyleAccess(pathStyleAccess));
         
@@ -216,7 +221,7 @@ public class ObjectSink extends AbstractOperator {
     }
     
     // Mandatory parameter accessKeyID mapping to the user's S3 Access Key ID
-    @Parameter(name="accessKeyID", description="Object Storage access key ID", optional=false)
+    @Parameter(name="accessKeyID", description="Object Storage access key ID", optional=true)
     public void setAccessKeyID(String accessKeyID) {
         this.accessKeyID = accessKeyID;
     }
@@ -225,7 +230,7 @@ public class ObjectSink extends AbstractOperator {
     }
     
     // Mandatory parameter secretAccessKey mapping to the user's S3 Secret Access Key
-    @Parameter(name="secretAccessKey", description="Object Storage secret access key", optional=false)
+    @Parameter(name="secretAccessKey", description="Object Storage secret access key", optional=true)
     public void setSecretAccessKey(String secretAccessKey) {
         this.secretAccessKey = secretAccessKey;
     }
